@@ -1,0 +1,621 @@
+/* --- 1. Global Setup & CSS Variables --- */
+:root {
+    /* Colors from tailwind.config */
+    --primary: #2b8cee;
+    --background-light: #f6f7f8;
+    --background-dark: #101922; /* (Dark mode not implemented in this snippet) */
+    --neutral-100-light: #ffffff;
+    --neutral-200-light: #e7edf3;
+    --neutral-300-light: #cfdbe7;
+    --neutral-400-light: #4c739a;
+    --neutral-900-light: #0d141b;
+    --accent-green: #078838;
+    --accent-red: #e73908;
+    
+    /* Standard Styles */
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+    --font-display: "Manrope", sans-serif;
+    --border-color: var(--neutral-200-light);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-display);
+    background-color: var(--background-light);
+    color: var(--neutral-900-light);
+    overflow-x: hidden;
+}
+
+/* --- 2. Main App Layout --- */
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 256px; /* 64 * 4 */
+    flex-shrink: 0;
+    background-color: var(--neutral-100-light);
+    border-right: 1px solid var(--border-color);
+    padding: 1rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* --- 3. Sidebar Styles --- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.sidebar-title h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--neutral-900-light);
+}
+
+.sidebar-title p {
+    font-size: 0.875rem;
+    color: var(--neutral-400-light);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-grow: 1;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-lg);
+    color: var(--neutral-900-light);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--neutral-200-light);
+}
+
+.nav-link.active {
+    background-color: rgba(43, 140, 238, 0.1); /* primary/10 */
+    color: var(--primary);
+}
+
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* --- At the end of Sidebar Styles --- */
+
+#toggle-sidebar-btn {
+    margin-left: auto; /* Pushes button to the right */
+    background: none;
+    padding: 0.25rem;
+    width: 32px;
+    height: 32px;
+}
+
+#toggle-sidebar-btn:hover {
+    background-color: var(--neutral-200-light);
+}
+
+/* --- COLLAPSED SIDEBAR STATE --- */
+.sidebar.collapsed {
+    width: 80px; /* New collapsed width */
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-title {
+    display: none; /* Hide title */
+}
+
+.sidebar.collapsed .nav-link span:last-child {
+    display: none; /* Hide nav text */
+}
+
+.sidebar.collapsed .nav-link {
+    justify-content: center; /* Center the icon */
+}
+
+.sidebar.collapsed .nav-link .material-symbols-outlined {
+    font-size: 1.5rem; /* Make icons a bit bigger */
+    margin-right: 0; /* Remove space */
+}
+
+.sidebar.collapsed .sidebar-header {
+    justify-content: center;
+}
+
+.sidebar.collapsed #toggle-sidebar-btn {
+    position: absolute; /* Position it relative to header */
+    top: 1.25rem;
+    right: 0.75rem;
+    margin-left: 0;
+}
+
+.sidebar.collapsed #toggle-sidebar-btn .material-symbols-outlined {
+    transform: rotate(180deg); /* Flip the icon */
+}
+
+/* --- 4. Top Header Bar --- */
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 2.5rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--neutral-200-light);
+    border-radius: var(--border-radius-lg);
+    padding-left: 1rem;
+    max-width: 400px;
+    flex-grow: 1;
+}
+
+.search-bar .material-symbols-outlined {
+    color: var(--neutral-400-light);
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 0.5rem;
+    border: none;
+    background-color: transparent;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: var(--neutral-400-light);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--neutral-200-light);
+    color: var(--neutral-900-light);
+    border: none;
+    cursor: pointer;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-image: url('https://avatar.vercel.sh/user.png');
+    background-size: cover;
+    border: 1px solid var(--border-color);
+}
+
+/* --- 5. Page Content --- */
+.page-content {
+    padding: 1.5rem 2.5rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.data-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* --- 6. Card Styles --- */
+.card {
+    background-color: var(--neutral-100-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xl);
+    padding: 1.5rem;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+/* --- 7. Form Styles --- */
+.form-card {
+    position: sticky;
+    top: 100px; /* (Header height + padding) */
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label,
+.form-group legend {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--neutral-400-light);
+    margin-bottom: 0.25rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--neutral-300-light);
+    border-radius: var(--border-radius);
+    background-color: var(--background-light);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(43, 140, 238, 0.2);
+}
+
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+.form-group-inline label {
+    font-weight: 500;
+}
+
+/* Skill Selector */
+.skill-selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.skill-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.skill-label:hover {
+    background-color: var(--background-light);
+}
+
+.skill-checkbox {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
+}
+
+.skill-label:has(input:checked) {
+    background-color: rgba(43, 140, 238, 0.1);
+    border-color: rgba(43, 140, 238, 0.5);
+    color: var(--primary);
+}
+
+/* --- 8. Button Styles --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: var(--border-radius-lg);
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    width: 100%;
+}
+.btn-primary:hover {
+    background-color: #2578d1;
+}
+
+.btn-secondary {
+    background-color: var(--neutral-200-light);
+    color: var(--neutral-900-light);
+}
+.btn-secondary:hover {
+    background-color: var(--neutral-300-light);
+}
+
+.btn-secondary .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+/* --- 9. Stats Grid --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-card p {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--neutral-400-light);
+}
+
+.stat-card span {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--neutral-900-light);
+}
+
+/* --- 10. Table Card --- */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.table-title h2 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--neutral-900-light);
+    margin: 0;
+}
+
+.table-title p {
+    font-size: 0.875rem;
+    color: var(--neutral-400-light);
+    margin-top: 0.125rem;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.btn-filter {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--neutral-400-light);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-filter:hover {
+    background-color: var(--neutral-200-light);
+}
+
+.btn-filter.active {
+    background-color: rgba(43, 140, 238, 0.1);
+    color: var(--primary);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--neutral-400-light);
+    border-bottom: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+}
+
+th, td {
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background-color: var(--background-light);
+}
+
+tbody th {
+    font-weight: 500;
+    color: var(--neutral-900-light);
+}
+
+.action-buttons button {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.action-btn-edit {
+    color: var(--primary);
+}
+.action-btn-delete {
+    color: var(--accent-red);
+}
+
+/* --- 11. Modal, Toast, Validation --- */
+.edit-modal { /* DEPRECATED - Using dialog */ }
+
+dialog {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+#toast-notification {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background-color: var(--accent-green);
+    transform: translateX(calc(100% + 1.5rem));
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 100;
+}
+
+#toast-notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+#toast-notification.error {
+    background-color: var(--accent-red);
+}
+
+.error-message {
+    color: var(--accent-red);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.error-message.active {
+    display: block;
+}
+
+input.invalid, select.invalid {
+    border-color: var(--accent-red);
+}
+
+/* --- 12. Responsive --- */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-card {
+        position: static;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none; /* Simplification for mobile */
+    }
+    .top-header {
+        padding: 0.75rem 1rem;
+    }
+    .page-content {
+        padding: 1rem;
+    }
+    .search-bar {
+        display: none; /* Simplification */
+    }
+}

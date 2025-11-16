@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Skill Tracker</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <!-- Our Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- 1. Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">S</div>
+                <div class="sidebar-title">
+                    <h1>SkillTracker</h1>
+                    <p>ACME Corporation</p>
+                </div>
+                <button class="icon-btn" id="toggle-sidebar-btn" title="Toggle Sidebar">
+                    <span class="material-symbols-outlined">menu_open</span>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link active">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span>Employees</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <span class="material-symbols-outlined">help_outline</span>
+                    <span>Help</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- 2. Main Content Area -->
+        <div class="main-content">
+            <!-- 2A. Top Header Bar -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="search-bar" placeholder="Search employees or skills...">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <button class="icon-btn">
+                        <span class="material-symbols-outlined">help_outline</span>
+                    </button>
+                    <div class="profile-icon"></div>
+                </div>
+            </header>
+
+            <!-- 2B. Page Content -->
+            <main class="page-content">
+                <div class="content-grid">
+
+                    <!-- Column 1: Add Employee Form -->
+                    <section class="form-card card">
+                        <h2>Add New Employee</h2>
+                        <form id="employee-form">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" required minlength="3">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <select id="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Finance">Finance</option>
+                                </select>
+                                <div class="error-message"></div>
+                            </div>
+                            <fieldset class="form-group">
+                                <legend>Skills</legend>
+                                <div class="skill-selector-group">
+                                    <label for="skill-html" class="skill-label">
+                                        <input type="checkbox" name="skills" value="HTML" id="skill-html"
+                                            class="skill-checkbox">
+                                        <span>HTML</span>
+                                    </label>
+                                    <label for="skill-css" class="skill-label">
+                                        <input type="checkbox" name="skills" value="CSS" id="skill-css"
+                                            class="skill-checkbox">
+                                        <span>CSS</span>
+                                    </label>
+                                    <label for="skill-js" class="skill-label">
+                                        <input type="checkbox" name="skills" value="JavaScript" id="skill-js"
+                                            class="skill-checkbox">
+                                        <span>JavaScript</span>
+                                    </label>
+                                    <label for="skill-python" class="skill-label">
+                                        <input type="checkbox" name="skills" value="Python" id="skill-python"
+                                            class="skill-checkbox">
+                                        <span>Python</span>
+                                    </label>
+                                    <label for="skill-sql" class="skill-label">
+                                        <input type="checkbox" name="skills" value="SQL" id="skill-sql"
+                                            class="skill-checkbox">
+                                        <span>SQL</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <div class="form-group-inline">
+                                <input type="checkbox" id="certified">
+                                <label for="certified">Certified?</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Employee</button>
+                        </form>
+                    </section>
+
+                    <!-- Column 2: Stats & Table -->
+                    <section class="data-column">
+                        <!-- Stats Grid -->
+                        <div class="stats-grid">
+                            <div class="stat-card card">
+                                <p>Total Employees</p>
+                                <span id="total-employees">0</span>
+                            </div>
+                            <div class="stat-card card">
+                                <p>Certified</p>
+                                <span id="certified-count">0</span>
+                            </div>
+                            <div class="stat-card card">
+                                <p>Non-Certified</p>
+                                <span id="non-certified-count">0</span>
+                            </div>
+                            <div class="stat-card card">
+                                <p>Most Common Skill</p>
+                                <span id="most-common-skill">N/A</span>
+                            </div>
+                        </div>
+
+                        <!-- Table Card -->
+                        <div class="table-card card">
+                            <div class="table-header">
+                                <div class="table-title">
+                                    <h2>All Employees</h2>
+                                    <p>Manage, filter, and export employee data.</p>
+                                </div>
+                                <button id="export-csv" class="btn btn-secondary">
+                                    <span class="material-symbols-outlined">download</span>
+                                    <span>Download Report</span>
+                                </button>
+                            </div>
+                            <div class="filter-buttons">
+                                <button class="btn-filter active" data-filter="All">All</button>
+                                <button class="btn-filter" data-filter="Engineering">Engineering</button>
+                                <button class="btn-filter" data-filter="HR">HR</button>
+                                <button class="btn-filter" data-filter="Sales">Sales</button>
+                                <button class="btn-filter" data-filter="Finance">Finance</button>
+                                <button class="btn-filter" data-filter="Certified">Certified Only</button>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Department</th>
+                                            <th>Skills</th>
+                                            <th>Certified</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employee-table-body">
+                                        <!-- JS will render rows here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <dialog id="edit-modal" class="card">
+        <h2>Edit Employee</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-employee-id">
+            <div class="form-group">
+                <label for="edit-name">Full Name</label>
+                <input type="text" id="edit-name" required minlength="3">
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email</label>
+                <input type="email" id="edit-email" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-department">Department</label>
+                <select id="edit-department" required>
+                    <option value="Engineering">Engineering</option>
+                    <option value="HR">HR</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Finance">Finance</option>
+                </select>
+            </div>
+            <fieldset class="form-group">
+                <legend>Skills</legend>
+                <div class="skill-selector-group">
+                    <label class="skill-label"><input type="checkbox" name="edit-skills" value="HTML"
+                            class="skill-checkbox"><span>HTML</span></label>
+                    <label class="skill-label"><input type="checkbox" name="edit-skills" value="CSS"
+                            class="skill-checkbox"><span>CSS</span></label>
+                    <label class="skill-label"><input type="checkbox" name="edit-skills" value="JavaScript"
+                            class="skill-checkbox"><span>JavaScript</span></label>
+                    <label class="skill-label"><input type="checkbox" name="edit-skills" value="Python"
+                            class="skill-checkbox"><span>Python</span></label>
+                    <label class="skill-label"><input type="checkbox" name="edit-skills" value="SQL"
+                            class="skill-checkbox"><span>SQL</span></label>
+                </div>
+            </fieldset>
+            <div class="form-group-inline">
+                <input type="checkbox" id="edit-certified">
+                <label for="edit-certified">Certified?</label>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancel-edit" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification"></div>
+
+    <script src="script.js" defer></script>
+</body>
+
+</html>
