@@ -1,9 +1,8 @@
 /* --- 1. Global Setup & CSS Variables --- */
 :root {
-    /* Colors from tailwind.config */
+    /* Colors */
     --primary: #2b8cee;
     --background-light: #f6f7f8;
-    --background-dark: #101922; /* (Dark mode not implemented in this snippet) */
     --neutral-100-light: #ffffff;
     --neutral-200-light: #e7edf3;
     --neutral-300-light: #cfdbe7;
@@ -18,6 +17,8 @@
     --border-radius-xl: 1rem;
     --font-display: "Manrope", sans-serif;
     --border-color: var(--neutral-200-light);
+    --sidebar-width: 256px;
+    --sidebar-width-collapsed: 80px;
 }
 
 * {
@@ -30,39 +31,43 @@ body {
     font-family: var(--font-display);
     background-color: var(--background-light);
     color: var(--neutral-900-light);
-    overflow-x: hidden;
+    /* Prevent the whole page from scrolling, we scroll internal areas instead */
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
 /* --- 2. Main App Layout --- */
 .app-container {
     display: flex;
     width: 100%;
-    height: 100vh;
-}
-
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 256px; /* 64 * 4 */
-    flex-shrink: 0;
-    background-color: var(--neutral-100-light);
-    border-right: 1px solid var(--border-color);
-    padding: 1rem;
-}
-
-.main-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow-y: auto;
+    height: 100%; /* Full viewport height */
+    overflow: hidden; /* Ensure no outer scrollbars */
 }
 
 /* --- 3. Sidebar Styles --- */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);
+    flex-shrink: 0; /* Never let the sidebar shrink below its width */
+    background-color: var(--neutral-100-light);
+    border-right: 1px solid var(--border-color);
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto; /* Sidebar scrolls internally if menu is too long */
+    overflow-x: hidden;
+    transition: width 0.3s ease-in-out; /* Smooth transition */
+    z-index: 20;
+}
+
 .sidebar-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem;
+    min-height: 60px; /* Prevent jumping during collapse */
+    position: relative;
 }
 
 .sidebar-logo {
@@ -71,11 +76,18 @@ body {
     justify-content: center;
     width: 40px;
     height: 40px;
+    min-width: 40px; /* Prevent squishing */
     border-radius: 9999px;
     background-color: var(--primary);
     color: white;
     font-weight: 700;
     font-size: 1.25rem;
+}
+
+.sidebar-title {
+    white-space: nowrap; /* Prevent text wrap during transition */
+    opacity: 1;
+    transition: opacity 0.2s ease;
 }
 
 .sidebar-title h1 {
@@ -108,6 +120,8 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     transition: background-color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .nav-link:hover {
@@ -115,7 +129,7 @@ body {
 }
 
 .nav-link.active {
-    background-color: rgba(43, 140, 238, 0.1); /* primary/10 */
+    background-color: rgba(43, 140, 238, 0.1);
     color: var(--primary);
 }
 
@@ -125,14 +139,20 @@ body {
     gap: 0.25rem;
 }
 
-/* --- At the end of Sidebar Styles --- */
-
+/* Sidebar Toggle Button */
 #toggle-sidebar-btn {
-    margin-left: auto; /* Pushes button to the right */
+    margin-left: auto;
     background: none;
     padding: 0.25rem;
     width: 32px;
     height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
 }
 
 #toggle-sidebar-btn:hover {
@@ -141,54 +161,82 @@ body {
 
 /* --- COLLAPSED SIDEBAR STATE --- */
 .sidebar.collapsed {
-    width: 80px; /* New collapsed width */
-    transition: width 0.3s ease;
+    width: var(--sidebar-width-collapsed);
 }
 
 .sidebar.collapsed .sidebar-title {
-    display: none; /* Hide title */
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    display: none; /* Hides it completely */
 }
 
 .sidebar.collapsed .nav-link span:last-child {
-    display: none; /* Hide nav text */
+    opacity: 0;
+    display: none; /* Hides text */
 }
 
 .sidebar.collapsed .nav-link {
-    justify-content: center; /* Center the icon */
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .sidebar.collapsed .nav-link .material-symbols-outlined {
-    font-size: 1.5rem; /* Make icons a bit bigger */
-    margin-right: 0; /* Remove space */
+    margin: 0;
+    font-size: 1.5rem;
 }
 
 .sidebar.collapsed .sidebar-header {
     justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .sidebar.collapsed #toggle-sidebar-btn {
-    position: absolute; /* Position it relative to header */
-    top: 1.25rem;
-    right: 0.75rem;
-    margin-left: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 7px; /* Hangs slightly off to indicate it opens */
+    background-color: var(--neutral-100-light);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 30;
+}
+
+.sidebar.collapsed #toggle-sidebar-btn:hover {
+    background-color: var(--neutral-200-light);
 }
 
 .sidebar.collapsed #toggle-sidebar-btn .material-symbols-outlined {
-    transform: rotate(180deg); /* Flip the icon */
+    transform: rotate(180deg);
 }
 
-/* --- 4. Top Header Bar --- */
+/* --- 4. Main Content Area (The Dashboard) --- */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: auto; /* Only main content scrolls vertically */
+    overflow-x: hidden; /* Prevent horizontal scroll on the main area */
+    min-width: 0; /* CRITICAL: Allows flex child to shrink smaller than content */
+    position: relative;
+}
+
+/* --- 5. Top Header Bar --- */
 .top-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 2.5rem;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(5px);
     z-index: 10;
+    flex-shrink: 0; /* Header doesn't shrink */
 }
 
 .search-bar {
@@ -213,10 +261,6 @@ body {
     font-family: var(--font-display);
     font-size: 1rem;
     outline: none;
-}
-
-.search-bar input::placeholder {
-    color: var(--neutral-400-light);
 }
 
 .header-actions {
@@ -247,14 +291,15 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* --- 5. Page Content --- */
+/* --- 6. Page Content --- */
 .page-content {
     padding: 1.5rem 2.5rem;
+    flex-grow: 1;
 }
 
 .content-grid {
     display: grid;
-    grid-template-columns: 380px 1fr;
+    grid-template-columns: 350px 1fr;
     gap: 1.5rem;
     align-items: flex-start;
 }
@@ -263,9 +308,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-width: 0; /* Allows grid item to shrink */
 }
 
-/* --- 6. Card Styles --- */
+/* --- 7. Card Styles --- */
 .card {
     background-color: var(--neutral-100-light);
     border: 1px solid var(--border-color);
@@ -279,10 +325,10 @@ body {
     margin-bottom: 1.25rem;
 }
 
-/* --- 7. Form Styles --- */
+/* --- 8. Form Styles --- */
 .form-card {
-    position: sticky;
-    top: 100px; /* (Header height + padding) */
+    /* Removed sticky because it causes issues in this layout style */
+    position: relative;
 }
 
 .form-group {
@@ -362,7 +408,7 @@ body {
     color: var(--primary);
 }
 
-/* --- 8. Button Styles --- */
+/* --- 9. Button Styles --- */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -398,10 +444,10 @@ body {
     font-size: 1.125rem;
 }
 
-/* --- 9. Stats Grid --- */
+/* --- 10. Stats Grid --- */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Responsive grid */
     gap: 1.5rem;
 }
 
@@ -417,7 +463,7 @@ body {
     color: var(--neutral-900-light);
 }
 
-/* --- 10. Table Card --- */
+/* --- 11. Table Card --- */
 .table-header {
     display: flex;
     justify-content: space-between;
@@ -469,9 +515,14 @@ body {
     color: var(--primary);
 }
 
+/* Table Wrapper - The Key to fixing horizontal scroll */
 .table-wrapper {
-    overflow-x: auto;
     width: 100%;
+    overflow-x: auto; /* Shows scrollbar ONLY on table if needed */
+    margin-top: 1rem;
+    /* Custom Scrollbar style for table */
+    scrollbar-width: thin;
+    scrollbar-color: var(--neutral-300-light) transparent;
 }
 
 table {
@@ -489,8 +540,16 @@ thead {
 }
 
 th, td {
-    padding: 0.75rem 1.5rem;
-    white-space: nowrap;
+    padding: 0.75rem 1rem; /* Slightly reduced padding to save space */
+    white-space: normal;   /* 1. Allow text to wrap to the next line */
+    word-wrap: break-word; /* 2. Break very long emails/words if needed */
+    vertical-align: top;   /* 3. Align text to top so rows look neat */
+    max-width: 300px;      /* 4. Prevent any single cell from getting too wide */
+}
+
+/* Specific tweak for the Skills column (4th column) */
+td:nth-child(4) {
+    min-width: 200px; /* Ensure skills have enough room to look good */
 }
 
 tbody tr {
@@ -511,6 +570,11 @@ tbody th {
     color: var(--neutral-900-light);
 }
 
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .action-buttons button {
     font-family: var(--font-display);
     font-weight: 500;
@@ -528,16 +592,19 @@ tbody th {
     color: var(--accent-red);
 }
 
-/* --- 11. Modal, Toast, Validation --- */
-.edit-modal { /* DEPRECATED - Using dialog */ }
-
+/* --- 12. Modal, Toast, Validation --- */
 dialog {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-xl);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    width: 100%;
+    width: 90%;
     max-width: 500px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    margin: 0;
 }
 
 dialog::backdrop {
@@ -592,30 +659,59 @@ input.invalid, select.invalid {
     border-color: var(--accent-red);
 }
 
-/* --- 12. Responsive --- */
-@media (max-width: 1200px) {
+/* --- 13. Responsive --- */
+@media (max-width: 1024px) {
     .content-grid {
         grid-template-columns: 1fr;
     }
-    .form-card {
-        position: static;
-    }
     .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        display: none; /* Simplification for mobile */
+    /* Reset layout for mobile */
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
     }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+    }
+    
+    /* Hide navigation items on mobile default, maybe add a hamburger later */
+    .sidebar-nav, .sidebar-footer, .sidebar-title p {
+        display: none;
+    }
+
+    #toggle-sidebar-btn {
+        display: none;
+    }
+
+    .main-content {
+        height: auto;
+        overflow: visible;
+    }
+
     .top-header {
         padding: 0.75rem 1rem;
     }
+
     .page-content {
         padding: 1rem;
     }
+    
     .search-bar {
-        display: none; /* Simplification */
+        display: none; /* Simplify mobile header */
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }
