@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('employee-table-body');
     const filterButtons = document.querySelector('.filter-buttons');
     const exportCsvButton = document.getElementById('export-csv');
-    const searchBar = document.getElementById('search-bar'); // <-- NEW
+    const searchBar = document.getElementById('search-bar');
 
     // Stats Elements
     const totalEl = document.getElementById('total-employees');
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Application State ---
     let employees = [];
     let currentFilter = 'All';
-    let currentSearchTerm = ''; // <-- NEW
+    let currentSearchTerm = '';
     let editingEmployeeId = null;
 
     // --- Initial Data ---
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (dataToRender.length === 0) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="6" style="text-align: center; color: var(--neutral-400-light);">No employees found...</td>`;
+            tr.innerHTML = `<td colspan="6" style="text-align: center; color: var(--neutral-400-light); padding: 1rem;">No employees found matching criteria.</td>`;
             tableBody.appendChild(tr);
             return;
         }
@@ -117,39 +117,30 @@ document.addEventListener('DOMContentLoaded', () => {
         mostCommonSkillEl.textContent = mostCommonSkill;
     }
 
-    /**
-     * NOW UPDATED to handle BOTH button filters AND search.
-     */
     function filterAndRender() {
-        let filteredEmployees = employees; // Start with all employees
+        let filteredEmployees = employees; 
 
         // 1. Apply Button Filter
         if (currentFilter !== 'All') {
             if (currentFilter === 'Certified') {
                 filteredEmployees = filteredEmployees.filter(emp => emp.certified);
             } else {
-                // Department filters
                 filteredEmployees = filteredEmployees.filter(emp => emp.department === currentFilter);
             }
         }
 
-        // 2. Apply Search Filter (to the already filtered list)
+        // 2. Apply Search Filter
         const searchTerm = currentSearchTerm.toLowerCase().trim();
         if (searchTerm) {
             filteredEmployees = filteredEmployees.filter(emp => {
-                // Check if name includes the search term
                 const nameMatch = emp.name.toLowerCase().includes(searchTerm);
-                
-                // Check if ANY skill includes the search term
                 const skillsMatch = emp.skills.some(skill => 
                     skill.toLowerCase().includes(searchTerm)
                 );
-                
-                return nameMatch || skillsMatch; // Return true if either matches
+                return nameMatch || skillsMatch;
             });
         }
 
-        // 3. Render the final list
         renderTable(filteredEmployees);
     }
 
@@ -182,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         employees.push(newEmployee);
         saveEmployees();
-        filterAndRender(); // Will now render with the current filter and search
+        filterAndRender();
         updateStats();
         resetForm();
         showToast('Employee added successfully!');
@@ -192,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm('Are you sure you want to delete this employee?')) {
             employees = employees.filter(emp => emp.id !== id);
             saveEmployees();
-            filterAndRender(); // Re-render the list
+            filterAndRender();
             updateStats();
             showToast('Employee deleted.', 'error');
         }
@@ -239,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         saveEmployees();
-        filterAndRender(); // Re-render the list
+        filterAndRender();
         updateStats();
         editModal.close();
         editingEmployeeId = null;
@@ -266,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         target.classList.add('active');
 
         currentFilter = target.dataset.filter;
-        filterAndRender(); // This will now re-filter with the new button AND the existing search term
+        filterAndRender();
     }
 
     function validateField(e) {
@@ -388,6 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
         editForm.addEventListener('submit', handleEditSubmit);
         cancelEditButton.addEventListener('click', () => editModal.close());
         exportCsvButton.addEventListener('click', exportToCSV);
+        
+        searchBar.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value;
+            filterAndRender();
+        });
 
         // --- Sidebar Toggle Button ---
         const sidebar = document.querySelector('.sidebar');
@@ -406,12 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
-        // --- NEW: Search Bar Event Listener ---
-        searchBar.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value;
-            filterAndRender(); // Re-filter on every keystroke
-        });
     }
 
     // Run the app
